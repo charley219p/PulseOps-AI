@@ -1,0 +1,41 @@
+[
+    {
+      "hospital_id": "H001",
+      "hospital_name": "City Hospital",
+      "distance_km": 2.5,
+      "travel_time_min": 8,
+      "resources": {
+        "icu_beds": 0,
+        "doctors": 2,
+        "ambulances": 2,
+        "ventilators": 1,
+        "ct_scan_available": true
+      }
+    },
+    {
+      "hospital_id": "H002",
+      "hospital_name": "Metro Hospital",
+      "distance_km": 4.8,
+      "travel_time_min": 12,
+      "resources": {
+        "icu_beds": 2,
+        "doctors": 5,
+        "ambulances": 1,
+        "ventilators": 3,
+        "ct_scan_available": true
+      }
+    },
+    {
+      "hospital_id": "H003",
+      "hospital_name": "Apollo Hospital",
+      "distance_km": 6.5,
+      "travel_time_min": 15,
+      "resources": {
+        "icu_beds": 5,
+        "doctors": 8,
+        "ambulances": 4,
+        "ventilators": 6,
+        "ct_scan_available": true
+      }
+    }
+  ]

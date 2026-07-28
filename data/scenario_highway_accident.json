@@ -1,0 +1,68 @@
+{
+    "scenario": "Multi-Vehicle Highway Accident",
+    "patients": [
+      {
+        "patient_id": "P001",
+        "age": 42,
+        "symptoms": ["Chest Pain", "Difficulty Breathing"],
+        "vitals": {
+          "heart_rate": 130,
+          "blood_pressure": "90/60",
+          "spo2": 88
+        },
+        "arrival_mode": "Ambulance"
+      },
+      {
+        "patient_id": "P002",
+        "age": 28,
+        "symptoms": ["Head Injury", "Dizziness"],
+        "vitals": {
+          "heart_rate": 102,
+          "blood_pressure": "120/80",
+          "spo2": 97
+        },
+        "arrival_mode": "Walk-in"
+      }
+    ],
+    "hospitals": [
+      {
+        "hospital_id": "H001",
+        "hospital_name": "Apollo Hospital",
+        "distance_km": 4.5,
+        "travel_time_min": 12,
+        "resources": {
+          "icu_beds": 2,
+          "doctors": 10,
+          "ambulances": 4,
+          "ventilators": 3,
+          "ct_scan_available": true
+        }
+      },
+      {
+        "hospital_id": "H002",
+        "hospital_name": "City Care Hospital",
+        "distance_km": 8.2,
+        "travel_time_min": 18,
+        "resources": {
+          "icu_beds": 1,
+          "doctors": 6,
+          "ambulances": 2,
+          "ventilators": 2,
+          "ct_scan_available": true
+        }
+      },
+      {
+        "hospital_id": "H003",
+        "hospital_name": "Metro Medical Center",
+        "distance_km": 6.0,
+        "travel_time_min": 15,
+        "resources": {
+          "icu_beds": 0,
+          "doctors": 8,
+          "ambulances": 3,
+          "ventilators": 1,
+          "ct_scan_available": false
+        }
+      }
+    ]
+  }

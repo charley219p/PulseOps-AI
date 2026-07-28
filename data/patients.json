@@ -1,0 +1,30 @@
+[
+    {
+      "patient_id": "P001",
+      "age": 68,
+      "symptoms": [
+        "Chest Pain",
+        "Sweating",
+        "Shortness of Breath"
+      ],
+      "vitals": {
+        "bp": "85/60",
+        "hr": 122,
+        "spo2": 90
+      },
+      "arrival_mode": "Ambulance"
+    },
+    {
+      "patient_id": "P002",
+      "age": 25,
+      "symptoms": [
+        "Broken Arm"
+      ],
+      "vitals": {
+        "bp": "120/80",
+        "hr": 80,
+        "spo2": 99
+      },
+      "arrival_mode": "Walk-in"
+    }
+  ]
