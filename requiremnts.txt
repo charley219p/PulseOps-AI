@@ -1,0 +1,10 @@
+langgraph
+langchain
+langchain-google-genai
+google-generativeai
+streamlit
+python-dotenv
+pydantic
+typing_extensions
+langchain-google-genai
+google-generativeai
