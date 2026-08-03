@@ -1,0 +1,54 @@
+[
+  {
+    "hospital_id": "H1",
+    "hospital_name": "City General Hospital",
+    "distance_km": 3.8,
+    "travel_time_min": 11,
+    "resources": {
+      "icu_beds": 6,
+      "doctors": 14,
+      "ambulances": 3,
+      "ventilators": 5,
+      "ct_scan_available": true
+    }
+  },
+  {
+    "hospital_id": "H2",
+    "hospital_name": "Metro Trauma Center",
+    "distance_km": 6.5,
+    "travel_time_min": 18,
+    "resources": {
+      "icu_beds": 10,
+      "doctors": 22,
+      "ambulances": 5,
+      "ventilators": 9,
+      "ct_scan_available": true
+    }
+  },
+  {
+    "hospital_id": "H3",
+    "hospital_name": "Riverside Community Hospital",
+    "distance_km": 9.1,
+    "travel_time_min": 24,
+    "resources": {
+      "icu_beds": 3,
+      "doctors": 8,
+      "ambulances": 2,
+      "ventilators": 2,
+      "ct_scan_available": false
+    }
+  },
+  {
+    "hospital_id": "H4",
+    "hospital_name": "Eastside Multispecialty Hospital",
+    "distance_km": 5.2,
+    "travel_time_min": 15,
+    "resources": {
+      "icu_beds": 8,
+      "doctors": 18,
+      "ambulances": 4,
+      "ventilators": 6,
+      "ct_scan_available": true
+    }
+  }
+]

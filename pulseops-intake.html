@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>PulseOps AI — Field Intake</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0f1a;
+    --bg-2:#0d1420;
+    --panel:#121a2b;
+    --panel-2:#182238;
+    --border:#22304a;
+    --border-light:#2c3c5c;
+    --text:#e9edf6;
+    --muted:#8a97b3;
+    --muted-2:#5d6a87;
+    --accent:#2dd4ee;
+    --accent-dim:#1a5f6e;
+    --critical:#f4483f;
+    --critical-dim:#3a1a1a;
+    --moderate:#f5a524;
+    --moderate-dim:#3a2c10;
+    --stable:#2ecc8f;
+    --stable-dim:#123526;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{-webkit-tap-highlight-color:transparent;}
+  body{
+    background:
+      radial-gradient(1200px 600px at 15% -10%, rgba(45,212,238,0.08), transparent 60%),
+      radial-gradient(900px 500px at 100% 0%, rgba(244,72,63,0.05), transparent 55%),
+      var(--bg);
+    color:var(--text);
+    font-family:'Inter',system-ui,sans-serif;
+    min-height:100vh;
+    padding-bottom:60px;
+  }
+  .mono{font-family:'JetBrains Mono',monospace;}
+  .display{font-family:'Space Grotesk',sans-serif;}
+
+  /* ---------- Header ---------- */
+  header{
+    padding:22px 20px 18px;
+    border-bottom:1px solid var(--border);
+    position:sticky; top:0; z-index:50;
+    background:rgba(10,15,26,0.92);
+    backdrop-filter:blur(10px);
+  }
+  .header-inner{max-width:720px;margin:0 auto;display:flex;align-items:center;gap:14px;}
+  .pulse-wrap{width:44px;height:44px;flex:none;border-radius:12px;background:var(--panel-2);border:1px solid var(--border-light);display:flex;align-items:center;justify-content:center;}
+  #pulseline{overflow:visible;}
+  #pulseline path{
+    fill:none;stroke:var(--accent);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;
+    stroke-dasharray:120; stroke-dashoffset:120;
+    animation:draw 2.4s ease-in-out infinite;
+  }
+  @keyframes draw{
+    0%{stroke-dashoffset:120;}
+    45%{stroke-dashoffset:0;}
+    100%{stroke-dashoffset:-120;}
+  }
+  .brand h1{font-size:19px;font-weight:700;letter-spacing:-0.01em;}
+  .brand p{font-size:12px;color:var(--muted);margin-top:1px;}
+  .step-track{max-width:720px;margin:14px auto 0;display:flex;gap:6px;}
+  .step-track .seg{height:3px;flex:1;background:var(--border);border-radius:3px;overflow:hidden;}
+  .step-track .seg i{display:block;height:100%;width:0%;background:var(--accent);transition:width .4s ease;}
+
+  main{max-width:720px;margin:0 auto;padding:28px 20px 0;}
+  .screen{display:none;animation:fadein .35s ease;}
+  .screen.active{display:block;}
+  @keyframes fadein{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+  /* ---------- Role select ---------- */
+  .intro{margin-bottom:26px;}
+  .eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:8px;}
+  h2{font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:600;letter-spacing:-0.01em;margin-bottom:8px;}
+  .sub{color:var(--muted);font-size:14.5px;line-height:1.55;max-width:52ch;}
+
+  .role-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:22px;}
+  @media (max-width:560px){.role-grid{grid-template-columns:1fr;}}
+  .role-card{
+    background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);
+    padding:22px 20px;text-align:left;cursor:pointer;color:var(--text);
+    display:flex;flex-direction:column;gap:10px;transition:border-color .15s, transform .15s, background .15s;
+    font-family:inherit;
+  }
+  .role-card:hover{border-color:var(--border-light);transform:translateY(-2px);}
+  .role-card:active{transform:translateY(0);}
+  .role-card .icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:19px;}
+  .role-card.bystander .icon{background:var(--moderate-dim);}
+  .role-card.medic .icon{background:var(--accent-dim);}
+  .role-card h3{font-size:16.5px;font-weight:600;font-family:'Space Grotesk',sans-serif;}
+  .role-card p{font-size:13px;color:var(--muted);line-height:1.5;}
+  .role-card .tag{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted-2);margin-top:auto;padding-top:6px;border-top:1px dashed var(--border);}
+
+  /* ---------- Form elements ---------- */
+  .field{margin-bottom:16px;}
+  label{display:block;font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:7px;letter-spacing:.01em;}
+  label .req{color:var(--critical);}
+  label .opt{color:var(--muted-2);font-weight:400;text-transform:none;}
+  input[type=text],input[type=number],select,textarea{
+    width:100%;background:var(--panel);border:1px solid var(--border);color:var(--text);
+    border-radius:10px;padding:12px 13px;font-size:14.5px;font-family:'Inter',sans-serif;
+    transition:border-color .15s, background .15s;
+  }
+  input::placeholder,textarea::placeholder{color:var(--muted-2);}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);background:var(--panel-2);}
+  select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238a97b3' stroke-width='2'><path d='M6 9l6 6 6-6'/></svg>");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px;}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+  @media (max-width:520px){.row3{grid-template-columns:1fr 1fr;}}
+
+  .seg-toggle{display:flex;border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+  .seg-toggle button{flex:1;background:var(--panel);color:var(--muted);border:none;padding:11px 8px;font-size:13.5px;font-weight:600;cursor:pointer;font-family:inherit;transition:.15s;}
+  .seg-toggle button.active{background:var(--accent);color:#04222b;}
+  .seg-toggle button + button{border-left:1px solid var(--border);}
+
+  .chip-input{display:flex;flex-wrap:wrap;gap:7px;padding:9px;background:var(--panel);border:1px solid var(--border);border-radius:10px;}
+  .chip-input input{border:none;background:transparent;flex:1;min-width:120px;padding:4px 2px;}
+  .chip-input input:focus{outline:none;}
+  .chip{display:flex;align-items:center;gap:6px;background:var(--panel-2);border:1px solid var(--border-light);color:var(--text);font-size:12.5px;padding:5px 6px 5px 10px;border-radius:20px;}
+  .chip button{background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;line-height:1;padding:2px;}
+  .chip button:hover{color:var(--critical);}
+  .hint{font-size:11.5px;color:var(--muted-2);margin-top:6px;}
+
+  /* ---------- Patient cards ---------- */
+  .section-title{display:flex;align-items:center;justify-content:space-between;margin:30px 0 14px;}
+  .section-title h3{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:600;}
+  .count-pill{font-size:11.5px;background:var(--panel-2);border:1px solid var(--border-light);color:var(--muted);padding:3px 9px;border-radius:20px;font-family:'JetBrains Mono',monospace;}
+
+  .patient-card{
+    background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);
+    padding:16px 16px 6px;margin-bottom:14px;position:relative;
+  }
+  .patient-card .p-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+  .p-head .p-id{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent);font-weight:600;}
+  .remove-btn{background:none;border:1px solid var(--border);color:var(--muted);width:26px;height:26px;border-radius:8px;cursor:pointer;font-size:14px;line-height:1;display:flex;align-items:center;justify-content:center;}
+  .remove-btn:hover{border-color:var(--critical);color:var(--critical);}
+
+  .severity-pick{display:flex;gap:8px;}
+  .sev-btn{flex:1;border-radius:9px;border:1px solid var(--border);background:var(--panel);color:var(--muted);padding:9px 6px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit;transition:.15s;}
+  .sev-btn.crit.active{background:var(--critical-dim);border-color:var(--critical);color:#ffb3ae;}
+  .sev-btn.mod.active{background:var(--moderate-dim);border-color:var(--moderate);color:#ffd48a;}
+  .sev-btn.stab.active{background:var(--stable-dim);border-color:var(--stable);color:#9be9c9;}
+
+  .add-btn{
+    width:100%;background:var(--panel);border:1.5px dashed var(--border-light);color:var(--accent);
+    padding:13px;border-radius:11px;font-size:13.5px;font-weight:600;cursor:pointer;font-family:inherit;
+    display:flex;align-items:center;justify-content:center;gap:7px;transition:.15s;margin-bottom:10px;
+  }
+  .add-btn:hover{background:var(--panel-2);border-color:var(--accent);}
+
+  /* ---------- Buttons / nav ---------- */
+  .nav-row{display:flex;gap:10px;margin-top:30px;padding-bottom:6px;}
+  .btn{
+    font-family:inherit;font-weight:700;font-size:14.5px;padding:14px 20px;border-radius:11px;border:none;
+    cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:.15s;
+  }
+  .btn-primary{background:var(--accent);color:#04222b;flex:1;}
+  .btn-primary:hover{background:#54e2f5;}
+  .btn-primary:disabled{background:var(--border-light);color:var(--muted-2);cursor:not-allowed;}
+  .btn-ghost{background:var(--panel);color:var(--muted);border:1px solid var(--border);}
+  .btn-ghost:hover{color:var(--text);border-color:var(--border-light);}
+
+  .error-msg{color:var(--critical);font-size:12.5px;margin-top:14px;display:none;}
+
+  /* ---------- Review screen ---------- */
+  .review-banner{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:20px;display:flex;gap:14px;align-items:flex-start;}
+  .review-banner .dot{width:10px;height:10px;border-radius:50%;background:var(--stable);margin-top:5px;flex:none;box-shadow:0 0 0 4px var(--stable-dim);}
+  .review-banner h3{font-family:'Space Grotesk',sans-serif;font-size:15px;margin-bottom:4px;}
+  .review-banner p{font-size:13px;color:var(--muted);line-height:1.5;}
+
+  .json-panel{background:#080c14;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+  .json-panel .jp-head{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid var(--border);}
+  .jp-head span{font-size:11.5px;color:var(--muted);font-family:'JetBrains Mono',monospace;letter-spacing:.03em;}
+  .copy-btn{background:var(--panel-2);border:1px solid var(--border-light);color:var(--text);font-size:11.5px;font-weight:600;padding:6px 11px;border-radius:7px;cursor:pointer;font-family:inherit;}
+  .copy-btn:hover{border-color:var(--accent);color:var(--accent);}
+  pre#jsonOut{padding:16px;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.65;color:#c7d4ea;overflow-x:auto;max-height:420px;}
+  pre#jsonOut .k{color:#7fd8e8;}
+  pre#jsonOut .s{color:#a8e6b0;}
+  pre#jsonOut .n{color:#f5a524;}
+  pre#jsonOut .b{color:#f4483f;}
+
+  .endpoint-field{margin-top:18px;}
+  .status-line{font-size:12.5px;margin-top:10px;color:var(--muted);display:none;}
+  .status-line.ok{color:var(--stable);}
+  .status-line.fail{color:var(--critical);}
+
+  .final-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px;}
+  @media (max-width:480px){.final-actions{grid-template-columns:1fr;}}
+
+  footer{max-width:720px;margin:36px auto 0;padding:16px 20px 0;border-top:1px solid var(--border);}
+  footer p{font-size:11.5px;color:var(--muted-2);text-align:center;line-height:1.6;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="pulse-wrap">
+      <svg id="pulseline" width="26" height="20" viewBox="0 0 60 30">
+        <path d="M0,15 L14,15 L19,4 L25,26 L30,15 L44,15 L48,9 L52,15 L60,15"/>
+      </svg>
+    </div>
+    <div class="brand">
+      <h1>PulseOps AI</h1>
+      <p>Field intake &middot; Emergency dispatch to triage</p>
+    </div>
+  </div>
+  <div class="step-track">
+    <div class="seg"><i id="segA"></i></div>
+    <div class="seg"><i id="segB"></i></div>
+    <div class="seg"><i id="segC"></i></div>
+  </div>
+</header>
+
+<main>
+
+  <!-- SCREEN 0: ROLE SELECT -->
+  <section class="screen active" id="screen-role">
+    <div class="intro">
+      <div class="eyebrow">Step 1 of 3</div>
+      <h2>Who's filing this report?</h2>
+      <p class="sub">Your role decides what we ask for. A bystander describes the scene; a medical professional gives us clinical data we can triage on directly.</p>
+    </div>
+    <div class="role-grid">
+      <button class="role-card bystander" onclick="selectRole('bystander')">
+        <div class="icon">📣</div>
+        <h3>Bystander / Caller</h3>
+        <p>You're on scene or nearby — no medical training needed. Describe what you see: the incident, who's hurt, how bad it looks.</p>
+        <div class="tag">First-person scene report</div>
+      </button>
+      <button class="role-card medic" onclick="selectRole('medic')">
+        <div class="icon">⚕️</div>
+        <h3>Medical Professional</h3>
+        <p>Nurse, paramedic, or EMT with patients in hand. Log vitals and symptoms directly for the clinical priority engine.</p>
+        <div class="tag">Vitals &amp; clinical data</div>
+      </button>
+    </div>
+  </section>
+
+  <!-- SCREEN 1a: BYSTANDER FORM -->
+  <section class="screen" id="screen-bystander">
+    <div class="intro">
+      <div class="eyebrow">Step 2 of 3 &middot; Scene report</div>
+      <h2>What's happening?</h2>
+      <p class="sub">Give us what you can see. It's fine to leave things approximate — "a few minutes ago" is better than nothing.</p>
+    </div>
+
+    <div class="field">
+      <label>Incident type <span class="req">*</span></label>
+      <select id="b_incident_type">
+        <option value="">Select one…</option>
+        <option>Road Accident</option>
+        <option>Fire</option>
+        <option>Medical Emergency</option>
+        <option>Building Collapse</option>
+        <option>Assault / Violence</option>
+        <option>Drowning</option>
+        <option>Electrocution</option>
+        <option>Other</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Location / nearest landmark <span class="req">*</span></label>
+      <input type="text" id="b_address" placeholder="e.g. Outer Ring Road near Marathahalli Bridge">
+    </div>
+
+    <div class="field">
+      <label>Vehicles involved <span class="opt">(optional)</span></label>
+      <div class="chip-input" id="vehicleChipBox">
+        <input type="text" id="vehicleInput" placeholder="Type a vehicle, press Enter — e.g. Car, Truck">
+      </div>
+      <p class="hint">Add one at a time. Duplicates are fine (e.g. Car, Car, Truck).</p>
+    </div>
+
+    <div class="section-title">
+      <h3>People affected</h3>
+      <span class="count-pill" id="bCount">0 added</span>
+    </div>
+    <div id="bystanderPatients"></div>
+    <button class="add-btn" onclick="addBystanderPatient()">+ Add a person</button>
+
+    <div class="row2" style="margin-top:22px;">
+      <div class="field">
+        <label>Traffic conditions</label>
+        <select id="b_traffic">
+          <option>Light</option>
+          <option selected>Moderate</option>
+          <option>Heavy</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Ambulance on scene?</label>
+        <div class="seg-toggle" id="ambToggle">
+          <button type="button" class="active" data-val="false" onclick="setAmb(this,false)">Not yet</button>
+          <button type="button" data-val="true" onclick="setAmb(this,true)">Arrived</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>When did this happen? <span class="req">*</span></label>
+      <div class="row3" id="timeQuick">
+        <button type="button" class="add-btn" style="margin:0;padding:11px 6px;" onclick="setTime('Just now')">Just now</button>
+        <button type="button" class="add-btn" style="margin:0;padding:11px 6px;" onclick="setTime('5 minutes ago')">~5 min ago</button>
+        <button type="button" class="add-btn" style="margin:0;padding:11px 6px;" onclick="setTime('15+ minutes ago')">15+ min ago</button>
+      </div>
+      <input type="text" id="b_time" placeholder="Or describe it — e.g. 5 minutes ago" style="margin-top:10px;">
+    </div>
+
+    <p class="error-msg" id="bError">Fill in the incident type, location, timing, and add at least one person before continuing.</p>
+
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="goTo('screen-role')">← Back</button>
+      <button class="btn btn-primary" onclick="reviewFrom('bystander')">Review report →</button>
+    </div>
+  </section>
+
+  <!-- SCREEN 1b: MEDIC FORM -->
+  <section class="screen" id="screen-medic">
+    <div class="intro">
+      <div class="eyebrow">Step 2 of 3 &middot; Clinical intake</div>
+      <h2>Log your patients</h2>
+      <p class="sub">One card per patient. IDs are assigned automatically — vitals feed straight into the priority engine.</p>
+    </div>
+
+    <div class="field">
+      <label>Scenario name <span class="req">*</span></label>
+      <input type="text" id="m_scenario" placeholder="e.g. Multi-Vehicle Highway Accident">
+    </div>
+
+    <div class="section-title">
+      <h3>Patients</h3>
+      <span class="count-pill" id="mCount">0 added</span>
+    </div>
+    <div id="medicPatients"></div>
+    <button class="add-btn" onclick="addMedicPatient()">+ Add patient</button>
+
+    <p class="error-msg" id="mError">Add a scenario name and at least one complete patient (age, one symptom, and vitals) before continuing.</p>
+
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="goTo('screen-role')">← Back</button>
+      <button class="btn btn-primary" onclick="reviewFrom('medic')">Review report →</button>
+    </div>
+  </section>
+
+  <!-- SCREEN 2: REVIEW -->
+  <section class="screen" id="screen-review">
+    <div class="intro">
+      <div class="eyebrow">Step 3 of 3 &middot; Review &amp; send</div>
+      <h2>Ready to dispatch</h2>
+      <p class="sub">Here's exactly what will be sent to PulseOps AI. Check it over, then send it or copy the JSON into the app.</p>
+    </div>
+
+    <div class="review-banner">
+      <div class="dot"></div>
+      <div>
+        <h3 id="reviewTitle">Report ready</h3>
+        <p id="reviewSubtitle">—</p>
+      </div>
+    </div>
+
+    <div class="json-panel">
+      <div class="jp-head">
+        <span id="jpLabel">payload.json</span>
+        <button class="copy-btn" onclick="copyJson()">Copy JSON</button>
+      </div>
+      <pre id="jsonOut"></pre>
+    </div>
+
+    <div class="endpoint-field">
+      <label>PulseOps API endpoint <span class="opt">(optional — leave blank to just export the file)</span></label>
+      <input type="text" id="apiEndpoint" placeholder="https://your-pulseops-instance/api/intake">
+      <p class="hint">Point this at your PulseOps backend once it exposes an intake endpoint. Until then, download or copy the JSON and load it in the app's sidebar uploader.</p>
+      <p class="status-line" id="sendStatus"></p>
+    </div>
+
+    <div class="final-actions">
+      <button class="btn btn-ghost" onclick="downloadJson()">↓ Download .json</button>
+      <button class="btn btn-primary" onclick="sendJson()">Send to PulseOps →</button>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-ghost" onclick="editAgain()">← Edit report</button>
+      <button class="btn btn-ghost" onclick="startOver()">Start a new report</button>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <p>PulseOps AI &middot; Field intake feeds the Clinical Priority, Resource Intelligence, and Hospital Selection agents.<br>Not a substitute for calling local emergency services directly.</p>
+</footer>
+
+<script>
+/* ---------------- state ---------------- */
+let currentRole = null;
+let vehicles = [];
+let bystanderPatientList = []; // {condition, severity, age_group}
+let medicPatientList = [];     // {age, symptoms:[], hr, bp, spo2, arrival_mode}
+let bPid = 0, mPid = 0;
+let ambPresent = false;
+let bTime = '';
+
+const steps = {'screen-role':0,'screen-bystander':1,'screen-medic':1,'screen-review':2};
+function updateTrack(id){
+  const n = steps[id] ?? 0;
+  document.getElementById('segA').style.width = n>=0 ? '100%':'0%';
+  document.getElementById('segB').style.width = n>=1 ? '100%':'0%';
+  document.getElementById('segC').style.width = n>=2 ? '100%':'0%';
+}
+function goTo(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  updateTrack(id);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function selectRole(role){
+  currentRole = role;
+  if(role==='bystander'){
+    if(bystanderPatientList.length===0) addBystanderPatient();
+    goTo('screen-bystander');
+  } else {
+    if(medicPatientList.length===0) addMedicPatient();
+    goTo('screen-medic');
+  }
+}
+
+/* ---------------- vehicle chips ---------------- */
+const vehicleInput = document.getElementById('vehicleInput');
+vehicleInput.addEventListener('keydown', e=>{
+  if(e.key==='Enter' && vehicleInput.value.trim()){
+    e.preventDefault();
+    vehicles.push(vehicleInput.value.trim());
+    vehicleInput.value='';
+    renderVehicles();
+  }
+});
+function renderVehicles(){
+  const box = document.getElementById('vehicleChipBox');
+  box.querySelectorAll('.chip').forEach(c=>c.remove());
+  vehicles.forEach((v,i)=>{
+    const chip = document.createElement('span');
+    chip.className='chip';
+    chip.innerHTML = `${escapeHtml(v)} <button type="button" onclick="removeVehicle(${i})">×</button>`;
+    box.insertBefore(chip, vehicleInput);
+  });
+}
+function removeVehicle(i){ vehicles.splice(i,1); renderVehicles(); }
+
+/* ---------------- quick time / toggle ---------------- */
+function setTime(val){ document.getElementById('b_time').value = val; }
+function setAmb(btn,val){
+  document.querySelectorAll('#ambToggle button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  ambPresent = val;
+}
+
+/* ---------------- bystander patients ---------------- */
+function addBystanderPatient(){
+  const id = bPid++;
+  bystanderPatientList.push({id, condition:'', severity:'Moderate', age_group:''});
+  renderBystanderPatients();
+}
+function removeBystanderPatient(id){
+  bystanderPatientList = bystanderPatientList.filter(p=>p.id!==id);
+  renderBystanderPatients();
+}
+function renderBystanderPatients(){
+  const wrap = document.getElementById('bystanderPatients');
+  wrap.innerHTML='';
+  bystanderPatientList.forEach((p,idx)=>{
+    const card = document.createElement('div');
+    card.className='patient-card';
+    card.innerHTML = `
+      <div class="p-head">
+        <span class="p-id">PERSON ${idx+1}</span>
+        <button class="remove-btn" onclick="removeBystanderPatient(${p.id})">×</button>
+      </div>
+      <div class="field">
+        <label>Condition / what you see <span class="req">*</span></label>
+        <input type="text" placeholder="e.g. Unconscious, Head Injury, Bleeding" value="${escapeAttr(p.condition)}"
+          oninput="updateBP(${p.id},'condition',this.value)">
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>Age group <span class="opt">(optional)</span></label>
+          <select onchange="updateBP(${p.id},'age_group',this.value)">
+            <option value="" ${p.age_group===''?'selected':''}>Not specified</option>
+            <option ${p.age_group==='Child'?'selected':''}>Child</option>
+            <option ${p.age_group==='Adult'?'selected':''}>Adult</option>
+            <option ${p.age_group==='Elderly'?'selected':''}>Elderly</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Severity, at a glance</label>
+          <div class="severity-pick">
+            <button type="button" class="sev-btn crit ${p.severity==='Critical'?'active':''}" onclick="updateBP(${p.id},'severity','Critical')">Critical</button>
+            <button type="button" class="sev-btn mod ${p.severity==='Moderate'?'active':''}" onclick="updateBP(${p.id},'severity','Moderate')">Moderate</button>
+            <button type="button" class="sev-btn stab ${p.severity==='Minor'?'active':''}" onclick="updateBP(${p.id},'severity','Minor')">Minor</button>
+          </div>
+        </div>
+      </div>`;
+    wrap.appendChild(card);
+  });
+  document.getElementById('bCount').textContent = `${bystanderPatientList.length} added`;
+}
+function updateBP(id,key,val){
+  const p = bystanderPatientList.find(p=>p.id===id);
+  if(p){ p[key]=val; if(key==='severity') renderBystanderPatients(); }
+}
+
+/* ---------------- medic patients ---------------- */
+function addMedicPatient(){
+  const id = mPid++;
+  medicPatientList.push({id, age:'', symptoms:[], symptomDraft:'', hr:'', bp:'', spo2:'', arrival_mode:'Ambulance'});
+  renderMedicPatients();
+}
+function removeMedicPatient(id){
+  medicPatientList = medicPatientList.filter(p=>p.id!==id);
+  renderMedicPatients();
+}
+function renderMedicPatients(){
+  const wrap = document.getElementById('medicPatients');
+  wrap.innerHTML='';
+  medicPatientList.forEach((p,idx)=>{
+    const pid = 'P'+String(idx+1).padStart(3,'0');
+    const card = document.createElement('div');
+    card.className='patient-card';
+    card.innerHTML = `
+      <div class="p-head">
+        <span class="p-id">${pid}</span>
+        <button class="remove-btn" onclick="removeMedicPatient(${p.id})">×</button>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>Age <span class="req">*</span></label>
+          <input type="number" min="0" max="120" placeholder="42" value="${p.age}" oninput="updateMP(${p.id},'age',this.value)">
+        </div>
+        <div class="field">
+          <label>Arrival mode</label>
+          <select onchange="updateMP(${p.id},'arrival_mode',this.value)">
+            <option ${p.arrival_mode==='Ambulance'?'selected':''}>Ambulance</option>
+            <option ${p.arrival_mode==='Walk-in'?'selected':''}>Walk-in</option>
+            <option ${p.arrival_mode==='Private Vehicle'?'selected':''}>Private Vehicle</option>
+            <option ${p.arrival_mode==='Airlift'?'selected':''}>Airlift</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Symptoms <span class="req">*</span></label>
+        <div class="chip-input" id="symBox${p.id}">
+          <input type="text" placeholder="Type a symptom, press Enter — e.g. Chest Pain" id="symIn${p.id}">
+        </div>
+      </div>
+      <div class="row3">
+        <div class="field">
+          <label>Heart rate <span class="opt">bpm</span></label>
+          <input type="number" min="0" placeholder="130" value="${p.hr}" oninput="updateMP(${p.id},'hr',this.value)">
+        </div>
+        <div class="field">
+          <label>Blood pressure</label>
+          <input type="text" placeholder="90/60" value="${escapeAttr(p.bp)}" oninput="updateMP(${p.id},'bp',this.value)">
+        </div>
+        <div class="field">
+          <label>SpO₂ <span class="opt">%</span></label>
+          <input type="number" min="0" max="100" placeholder="88" value="${p.spo2}" oninput="updateMP(${p.id},'spo2',this.value)">
+        </div>
+      </div>`;
+    wrap.appendChild(card);
+
+    // wire symptom chip input
+    const symBox = card.querySelector(`#symBox${p.id}`);
+    p.symptoms.forEach((s,si)=>{
+      const chip = document.createElement('span');
+      chip.className='chip';
+      chip.innerHTML = `${escapeHtml(s)} <button type="button">×</button>`;
+      chip.querySelector('button').onclick = ()=>{ p.symptoms.splice(si,1); renderMedicPatients(); };
+      symBox.insertBefore(chip, symBox.querySelector('input'));
+    });
+    const symIn = card.querySelector(`#symIn${p.id}`);
+    symIn.addEventListener('keydown', e=>{
+      if(e.key==='Enter' && symIn.value.trim()){
+        e.preventDefault();
+        p.symptoms.push(symIn.value.trim());
+        renderMedicPatients();
+      }
+    });
+  });
+  document.getElementById('mCount').textContent = `${medicPatientList.length} added`;
+}
+function updateMP(id,key,val){
+  const p = medicPatientList.find(p=>p.id===id);
+  if(p) p[key]=val;
+}
+
+/* ---------------- validation + review ---------------- */
+function reviewFrom(role){
+  bTime = document.getElementById('b_time') ? document.getElementById('b_time').value.trim() : bTime;
+  if(role==='bystander'){
+    const type = document.getElementById('b_incident_type').value;
+    const addr = document.getElementById('b_address').value.trim();
+    const ok = type && addr && bTime && bystanderPatientList.length>0 &&
+               bystanderPatientList.every(p=>p.condition.trim());
+    document.getElementById('bError').style.display = ok ? 'none':'block';
+    if(!ok) return;
+  } else {
+    const scenario = document.getElementById('m_scenario').value.trim();
+    const ok = scenario && medicPatientList.length>0 &&
+               medicPatientList.every(p=>p.age!=='' && p.symptoms.length>0 && p.hr!=='' && p.bp.trim() && p.spo2!=='');
+    document.getElementById('mError').style.display = ok ? 'none':'block';
+    if(!ok) return;
+  }
+  renderReview(role);
+  goTo('screen-review');
+}
+function editAgain(){
+  goTo(currentRole==='bystander' ? 'screen-bystander' : 'screen-medic');
+}
+function startOver(){
+  currentRole=null; vehicles=[]; bystanderPatientList=[]; medicPatientList=[]; bPid=0; mPid=0; ambPresent=false; bTime='';
+  document.getElementById('b_incident_type').value='';
+  document.getElementById('b_address').value='';
+  document.getElementById('b_time').value='';
+  document.getElementById('m_scenario').value='';
+  renderVehicles(); renderBystanderPatients(); renderMedicPatients();
+  document.getElementById('sendStatus').style.display='none';
+  goTo('screen-role');
+}
+
+/* ---------------- build payload ---------------- */
+function buildPayload(){
+  if(currentRole==='bystander'){
+    return {
+      incident_type: document.getElementById('b_incident_type').value,
+      location: { address: document.getElementById('b_address').value.trim() },
+      vehicles_involved: vehicles,
+      patients: bystanderPatientList.map(p=>{
+        const o = { condition: p.condition.trim(), severity: p.severity };
+        if(p.age_group) o.age_group = p.age_group;
+        return o;
+      }),
+      traffic: document.getElementById('b_traffic').value,
+      ambulance_present: ambPresent,
+      incident_time: bTime
+    };
+  } else {
+    return {
+      scenario: document.getElementById('m_scenario').value.trim(),
+      patients: medicPatientList.map((p,idx)=>({
+        patient_id: 'P'+String(idx+1).padStart(3,'0'),
+        age: Number(p.age),
+        symptoms: p.symptoms,
+        vitals: {
+          heart_rate: Number(p.hr),
+          blood_pressure: p.bp.trim(),
+          spo2: Number(p.spo2)
+        },
+        arrival_mode: p.arrival_mode
+      }))
+    };
+  }
+}
+function syntaxHighlight(json){
+  let s = JSON.stringify(json, null, 2);
+  s = s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  s = s.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?)/g,
+    match=>{
+      let cls='n';
+      if(/^"/.test(match)) cls = /:$/.test(match) ? 'k' : 's';
+      else if(/true|false/.test(match)) cls='b';
+      return `<span class="${cls}">${match}</span>`;
+    });
+  return s;
+}
+function renderReview(role){
+  const payload = buildPayload();
+  document.getElementById('jsonOut').innerHTML = syntaxHighlight(payload);
+  if(role==='bystander'){
+    document.getElementById('jpLabel').textContent = 'scene_report.json';
+    document.getElementById('reviewTitle').textContent = payload.incident_type + ' — ' + (payload.location.address || 'location pending');
+    document.getElementById('reviewSubtitle').textContent = `${payload.patients.length} ${payload.patients.length===1?'person':'people'} reported · ${payload.ambulance_present ? 'ambulance on scene' : 'no ambulance yet'} · ${payload.traffic.toLowerCase()} traffic`;
+  } else {
+    document.getElementById('jpLabel').textContent = 'clinical_intake.json';
+    document.getElementById('reviewTitle').textContent = payload.scenario;
+    document.getElementById('reviewSubtitle').textContent = `${payload.patients.length} patient${payload.patients.length===1?'':'s'} logged with vitals · ready for the Clinical Priority Agent`;
+  }
+  document.getElementById('sendStatus').style.display='none';
+}
+
+/* ---------------- actions ---------------- */
+function copyJson(){
+  const payload = buildPayload();
+  navigator.clipboard.writeText(JSON.stringify(payload,null,2)).then(()=>{
+    flashStatus('Copied to clipboard.', true);
+  }).catch(()=>{
+    flashStatus('Could not copy — select the text manually.', false);
+  });
+}
+function downloadJson(){
+  const payload = buildPayload();
+  const blob = new Blob([JSON.stringify(payload,null,2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = currentRole==='bystander' ? 'pulseops_scene_report.json' : 'pulseops_clinical_intake.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+  flashStatus('File downloaded.', true);
+}
+async function sendJson(){
+  const endpoint = document.getElementById('apiEndpoint').value.trim();
+  const payload = buildPayload();
+  if(!endpoint){
+    flashStatus('No endpoint set — download or copy the JSON instead.', false);
+    return;
+  }
+  flashStatus('Sending…', true, true);
+  try{
+    const res = await fetch(endpoint, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    if(res.ok) flashStatus('Sent successfully.', true);
+    else flashStatus(`Endpoint responded with ${res.status}.`, false);
+  }catch(err){
+    flashStatus('Could not reach that endpoint. Check the URL and CORS settings.', false);
+  }
+}
+function flashStatus(msg, ok){
+  const el = document.getElementById('sendStatus');
+  el.textContent = msg;
+  el.className = 'status-line ' + (ok ? 'ok':'fail');
+  el.style.display = 'block';
+}
+
+/* ---------------- utils ---------------- */
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function escapeAttr(s){ return escapeHtml(s); }
+
+/* init */
+renderVehicles();
+</script>
+</body>
+</html>
