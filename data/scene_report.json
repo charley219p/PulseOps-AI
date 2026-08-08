@@ -1,0 +1,17 @@
+{
+    "incident_type": "Road Accident",
+    "location": {
+      "address": "near bvb collage"
+    },
+    "vehicles_involved": [],
+    "patients": [
+      {
+        "condition": "head injury",
+        "severity": "Moderate",
+        "age_group": "Adult"
+      }
+    ],
+    "traffic": "Moderate",
+    "ambulance_present": false,
+    "incident_time": "5 minutes ago"
+  }

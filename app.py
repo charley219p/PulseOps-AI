@@ -227,3 +227,5 @@ Executive Report
 
     st.divider()
     st.caption("Built with ❤️ Streamlit + LangGraph + Plotly")
+
+

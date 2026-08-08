@@ -1,30 +1,147 @@
 [
-    {
-      "patient_id": "P001",
-      "age": 68,
-      "symptoms": [
-        "Chest Pain",
-        "Sweating",
-        "Shortness of Breath"
-      ],
-      "vitals": {
-        "bp": "85/60",
-        "hr": 122,
-        "spo2": 90
-      },
-      "arrival_mode": "Ambulance"
+  {
+    "patient_id": "P001",
+    "age": 68,
+    "symptoms": [
+      "Chest Pain",
+      "Sweating",
+      "Shortness of Breath"
+    ],
+    "vitals": {
+      "bp": "85/60",
+      "hr": 122,
+      "spo2": 90
     },
-    {
-      "patient_id": "P002",
-      "age": 25,
-      "symptoms": [
-        "Broken Arm"
-      ],
-      "vitals": {
-        "bp": "120/80",
-        "hr": 80,
-        "spo2": 99
-      },
-      "arrival_mode": "Walk-in"
-    }
-  ]
+    "arrival_mode": "Ambulance"
+  },
+  {
+    "patient_id": "P002",
+    "age": 25,
+    "symptoms": [
+      "Broken Arm"
+    ],
+    "vitals": {
+      "bp": "120/80",
+      "hr": 80,
+      "spo2": 99
+    },
+    "arrival_mode": "Walk-in"
+  },
+  {
+    "patient_id": "P003",
+    "age": 74,
+    "symptoms": [
+      "Severe Shortness of Breath",
+      "Confusion",
+      "Dizziness"
+    ],
+    "vitals": {
+      "bp": "90/55",
+      "hr": 118,
+      "spo2": 82
+    },
+    "arrival_mode": "Ambulance"
+  },
+  {
+    "patient_id": "P004",
+    "age": 42,
+    "symptoms": [
+      "High Fever",
+      "Chills",
+      "Weakness"
+    ],
+    "vitals": {
+      "bp": "110/70",
+      "hr": 105,
+      "spo2": 96
+    },
+    "arrival_mode": "Walk-in"
+  },
+  {
+    "patient_id": "P005",
+    "age": 31,
+    "symptoms": [
+      "Minor Headache",
+      "Nausea"
+    ],
+    "vitals": {
+      "bp": "118/76",
+      "hr": 76,
+      "spo2": 98
+    },
+    "arrival_mode": "Walk-in"
+  },
+  {
+    "patient_id": "P006",
+    "age": 59,
+    "symptoms": [
+      "Severe Abdominal Pain",
+      "Vomiting",
+      "Sweating"
+    ],
+    "vitals": {
+      "bp": "92/62",
+      "hr": 115,
+      "spo2": 94
+    },
+    "arrival_mode": "Ambulance"
+  },
+  {
+    "patient_id": "P007",
+    "age": 19,
+    "symptoms": [
+      "Ankle Sprain",
+      "Mild Pain"
+    ],
+    "vitals": {
+      "bp": "122/78",
+      "hr": 82,
+      "spo2": 99
+    },
+    "arrival_mode": "Walk-in"
+  },
+  {
+    "patient_id": "P008",
+    "age": 81,
+    "symptoms": [
+      "Difficulty Speaking",
+      "Facial Drooping",
+      "Weakness in Left Arm"
+    ],
+    "vitals": {
+      "bp": "175/105",
+      "hr": 98,
+      "spo2": 93
+    },
+    "arrival_mode": "Ambulance"
+  },
+  {
+    "patient_id": "P009",
+    "age": 47,
+    "symptoms": [
+      "Moderate Chest Discomfort",
+      "Fatigue"
+    ],
+    "vitals": {
+      "bp": "135/85",
+      "hr": 92,
+      "spo2": 97
+    },
+    "arrival_mode": "Walk-in"
+  },
+  {
+    "patient_id": "P010",
+    "age": 66,
+    "symptoms": [
+      "Severe Breathing Difficulty",
+      "Bluish Lips",
+      "Extreme Fatigue"
+    ],
+    "vitals": {
+      "bp": "78/50",
+      "hr": 130,
+      "spo2": 76
+    },
+    "arrival_mode": "Ambulance"
+  }
+]
